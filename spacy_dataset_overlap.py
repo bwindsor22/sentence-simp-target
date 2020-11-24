@@ -16,6 +16,8 @@ all_sents = list()
 for dataset_, text_field in datasets_dict.items():
     data = load_dataset(dataset_)
     for i, element in enumerate(data['train']):
+        if i % 1000 == 0:
+            print(i)
         text = element[text_field]
         doc = nlp(text)
         for sent in doc.sents:
@@ -32,7 +34,7 @@ corr = df2.corr()
 
 df_asint = df.astype(int)
 coocc = df_asint.T.dot(df_asint)
-
+print(coocc)
 
 print('hi')
 
