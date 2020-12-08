@@ -10,14 +10,22 @@ datasets_dict = {
     'yelp_polarity': 'text'
 }
 
+# max_dataset_size = 2000
+dataset_start_from = 800000
+max_dataset_size = dataset_start_from + 500000
 all_sents = list()
 
-
+# Add Labels
 for dataset_, text_field in datasets_dict.items():
     data = load_dataset(dataset_)
+    print('total len', len(data['train']))
     for i, element in enumerate(data['train']):
+        if i < dataset_start_from:
+            continue
         if i % 1000 == 0:
-            print(i)
+            print(i, 'of', max_dataset_size)
+        if i >= max_dataset_size:
+            break
         text = element[text_field]
         doc = nlp(text)
         for sent in doc.sents:
@@ -28,14 +36,21 @@ for dataset_, text_field in datasets_dict.items():
                 text = {'text': sent.text}
                 all_sents.append({**text, **labels})
 
+# Show Co-occurrence matrix
 df = pd.DataFrame(all_sents)
-df2 = df.iloc[:, df.columns != 'text']
-corr = df2.corr()
+occ_df = df.iloc[:, df.columns != 'text']
 
-df_asint = df.astype(int)
-coocc = df_asint.T.dot(df_asint)
-print(coocc)
+occ_df = occ_df.fillna(0)
+occ_df = occ_df.astype(int)
+coocc = occ_df.T.dot(occ_df)
+print(coocc.to_string())
 
+
+# Generate dataset for annotation
+# df2 = df.iloc[:, df.columns != 'text']
+# df2 = df2.astype(int)
+occ_df['text'] = df['text']
+filtered_df = occ_df[(occ_df['ORG'] == 1) & (occ_df['NORP'] == 1) & (occ_df['LOC'] == 1)]
+print('rows', filtered_df.size)
+filtered_df.to_csv('./org-norp-loc-batch-4.csv')
 print('hi')
-
-
