@@ -12,7 +12,7 @@ model_name = 'roberta-base'
 run_name = 'enc-dec-org-norp'
 
 epochs = 580
-test_every = 40
+test_every = 20
 batch_size = 8
 learning_rate = 3e-5
 device = 'cpu'
@@ -25,20 +25,27 @@ logging.getLogger().addHandler(logging.StreamHandler())
 DATASETS
 """
 def get_df():
-    file_path = '/Users/bradwindsor/classwork/natural_language_processing/paper/org-norp-loc-batch-1,3,2.csv'
+    # file_path = '/Users/bradwindsor/classwork/natural_language_processing/paper/org-norp-loc-batch-1,3,2.csv'
+    file_path = '/Users/bradwindsor/classwork/natural_language_processing/paper/masked_dataset.csv'
     return pd.read_csv(file_path, engine='python')
 
 def org_norp():
-    column_name = 'ORG NORP Simplified'
+    # column_name = 'ORG NORP Simplified'
+    column_name = 'org_norp'
     return get_data_for_column(column_name)
 
+
 def org_loc():
-    column_name = 'ORG LOC Simplified'
+    # column_name = 'ORG LOC Simplified'
+    column_name = 'org_loc'
     return get_data_for_column(column_name)
 
 def get_data_for_column(column_name):
     df = get_df()
     df = df[df[column_name] != 'pass']
+    df = df.fillna('')
+    df = df[df['text'] != '']
+    df = df[df[column_name] != '']
     text = df[['text']].values
     simplified = df[[column_name]].values
     tups = [(a[0], b[0]) for a, b in zip(text, simplified)]
@@ -48,8 +55,6 @@ def divide_chunks(l, n):
     # looping till length l
     for i in range(0, len(l), n):
         yield l[i:i + n]
-
-
 
 """
 SET UP TRAINING DATA AND MODEL
