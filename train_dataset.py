@@ -3,6 +3,8 @@ import random
 import pandas as pd
 import torch
 from pprint import pprint
+from nltk.translate.bleu_score import sentence_bleu
+
 from transformers import EncoderDecoderModel, RobertaTokenizer, AdamW
 
 """
@@ -117,10 +119,18 @@ def run_snip(snip, name):
 
     gen = generated.cpu().numpy()
 
-    for row in gen:
-        # logging.info(str(row))
-        logging.info(str(tokenizer.decode(row)))
+    target_simplifications = [e[1] for e in snip]
 
+    bleus = []
+    for i, row in enumerate(gen):
+        target = target_simplifications[i]
+        output = tokenizer.decode(row)
+        logging.info("target %s", str(target))
+        logging.info("actual %s", str(output))
+        cleaned_out = output.replace('<pad>', '').replace('<s>', ' ')
+        bleus.append(sentence_bleu([target], cleaned_out))
+    avg_bleu = sum(bleus) / len(bleus)
+    logging.info("Average Bleu %s", str(avg_bleu))
 
 cume_losses = []
 for epoch in range(epochs):
