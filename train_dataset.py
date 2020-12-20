@@ -59,9 +59,9 @@ def divide_chunks(l, n):
 """
 SET UP TRAINING DATA AND MODEL
 """
-def tokenize(text):
+def tokenize(text, max_len=60):
     toks = tokenizer.encode(text)
-    return pad_to_len(toks)
+    return pad_to_len(toks, max_len=max_len)
 
 
 def pad_to_len(toks, max_len=60):
@@ -126,8 +126,8 @@ cume_losses = []
 for epoch in range(epochs):
     cume_loss = 0
     for chunk in divide_chunks(train_data, batch_size):
-        inp_ids = torch.tensor([tokenize(e[0]) for e in chunk]).to(device)
-        out_ids = torch.tensor([tokenize(e[1]) for e in chunk]).to(device)
+        inp_ids = torch.tensor([tokenize(e[0], max_len=60) for e in chunk]).to(device)
+        out_ids = torch.tensor([tokenize(e[1], max_len=15) for e in chunk]).to(device)
         optimizer.zero_grad()
         out = model(input_ids=inp_ids, decoder_input_ids=out_ids, labels=out_ids)
         loss = out['loss']
