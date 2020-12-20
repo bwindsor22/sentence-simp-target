@@ -150,7 +150,7 @@ for epoch in range(epochs):
     if epoch % 999 == 0 or epoch == epochs - 1:
         model.save_pretrained(model_save_dir)
     if epoch % test_every == 0:
-        snip = test_data[:10]
+        snip = test_data
         run_snip(snip, 'test')
 
     cume_losses.append(cume_loss)
