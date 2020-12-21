@@ -17,7 +17,7 @@ epochs = 580
 test_every = 20
 batch_size = 8
 learning_rate = 3e-5
-device = 'cpu'
+device = 'gpu:0'
 
 log_file_name = './{}-{}-epch-{}-batch-{}-lr-{}-out.log'.format(run_name, model_name, epochs, batch_size, learning_rate)
 logging.basicConfig(filename=log_file_name, level=logging.INFO)
@@ -28,7 +28,7 @@ DATASETS
 """
 def get_df():
     # file_path = '/Users/bradwindsor/classwork/natural_language_processing/paper/org-norp-loc-batch-1,3,2.csv'
-    file_path = '/Users/bradwindsor/classwork/natural_language_processing/paper/masked_dataset.csv'
+    file_path = './full_dataset.csv'
     return pd.read_csv(file_path, engine='python')
 
 def org_norp():
